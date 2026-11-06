@@ -1,9 +1,16 @@
+import 'dotenv/config';
 import express from 'express';
-import pool from './data/db.js';
+import szakkorroute from './routes/szakkorokRoute.js';
+
 
 const app = express();
-const PORT  = 3000;
+app.use(express.json());
+const PORT = Number(process.env.PORT ?? 3000);
 
+let vegpontok = [
+    { vegpont: `http://localhost:${process.env.PORT ?? 3000}/szakkorok`, leiras: 'Szakkorok' }
+]
+/*
 app.get('/szakkorok', async (req, res) => {
     const {nap, vanHely} = req.query;
     
@@ -32,8 +39,19 @@ app.get('/szakkorok/:id', async (req, res) => {
     let sz_eredmeny = await pool.query(sqlsz, id);
     res.json(sz_eredmeny);
 });
+*/
 
+app.use('/szakkorok', szakkorroute);
+
+app.use('/', (req, res) => {
+    res.status(404).json(vegpontok);
+});
+
+app.use((err, res, req) => {
+    console.error(err);
+    res.status(500).json({ hiba: 'Belső szerverhiba' });
+});
 
 app.listen(PORT, () => {
-    console.log(`Szerver fut: http://localhost:${3000}`);
+    console.log(`Szerver fut: http://localhost:${PORT}`);
 });
